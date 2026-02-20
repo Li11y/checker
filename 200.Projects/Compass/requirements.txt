@@ -1,0 +1,3 @@
+playwright==1.49.0
+requests>=2.31.0
+urllib3<2  # Python 3.9 + LibreSSL 環境で SSL 警告を避ける
