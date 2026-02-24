@@ -40,9 +40,17 @@ def check_clinic_availability(target_date: str) -> Tuple[bool, str]:
             page.goto(CLINIC_URL, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(2000)
 
-            _log("2. 『再診(婦人科)』ボタンをクリックします...")
-            reishin_btn = page.locator("a, input, button").filter(has_text=re.compile(r"再診.*婦人科")).first
+            _log("2. 『再診(婦人科)』ボタンを探しています...")
+            # 文字が含まれている要素をより広く探す
+            reishin_btn = page.locator("a, button, input, div.btn").filter(has_text="再診").filter(has_text="婦人科").first
+            
+            # もし上記で見つからない場合の予備（「再診」だけで探す）
+            if reishin_btn.count() == 0:
+                _log("   条件を緩めて『再診』ボタンを探します...")
+                reishin_btn = page.get_by_role("button", name=re.compile(r"再診")).first
+
             reishin_btn.click()
+            _log("   クリック成功！")
             page.wait_for_timeout(2000)
 
             _log("3. 『次へ』ボタンをクリックします...")
