@@ -37,7 +37,7 @@ def check_clinic_availability(target_date: str) -> Tuple[bool, str]:
         browser = p.chromium.launch(
             headless=True,
             proxy={
-                "server": "http://160.16.109.131:8080" # 日本のプロキシサーバーの一例
+                "server": "http://219.100.37.245:443" # 筑波大学のVPN Gateプロジェクトなどの比較的安定した日本のIP（例）
             }
         )
         context = browser.new_context(user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1")
