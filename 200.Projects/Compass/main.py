@@ -173,7 +173,7 @@ def check_availability(target_date: str) -> Tuple[bool, str]:
 
         # 対象日のセルを探す: 「日付の数字」と「× or ○ or △」が同じ要素内にあるセル
         no_slot_marks = ["X", "×", "✕", "❌", "満員", "売切", "－", "ー", "−"]
-        slot_marks = ["○", "〇", "△", "▲", "空き", "◯", "◎", "購入", "選択"]
+        slot_marks = ["○", "〇", "△", "▲", "空き", "◯", "◎", "残り", "予約", "購入", "選択"]
         date_cell = None
         found_available = False
         found_no_slots = False
@@ -207,11 +207,11 @@ def check_availability(target_date: str) -> Tuple[bool, str]:
                     if has_yes:
                         found_available = True
                     break
-                # 210行目付近の判定をデバッグ用に強化（何が見えていたかログに出す）
-                _log(f"デバッグ: 対象日のテキスト = '{cell_text}'")
+
                 # 日付＋—（ダッシュ）だけのセルは「未選択」なのでスキップして続行
                 if "—" in text or "－" in text:
                     continue
+                _log(f"確認中のセル: {text}")
                 if day_num in text or day_part in text:
                     date_cell = el
                     break
@@ -248,7 +248,7 @@ def check_availability(target_date: str) -> Tuple[bool, str]:
 
         if found_no_slots:
             return False, f"{target_date} は空きなし（カレンダーでX/満員等の表示です）。"
-        if found_available:
+        if found_available or (date_cell and not found_no_slots):
             return True, f"{target_date} に空きがあります。サイトでご確認ください。"
         if date_cell:
             return False, f"{target_date} は空きなしの表示です。"
