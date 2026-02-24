@@ -40,17 +40,23 @@ def check_clinic_availability(target_date: str) -> Tuple[bool, str]:
             page.goto(CLINIC_URL, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(2000)
 
-            _log("2. 『再診(婦人科)』ボタンを文字で直接探しています...")
+            _log("2. ページの読み込みを確認中...")
+            page.wait_for_timeout(5000) # 念のため5秒待つ
             
-            # タグの種類を問わず、"再診(婦人科)" という文字が含まれる要素を探す
-            # ページ全体から一番最初に見つかったものをターゲットにします
-            reishin_target = page.get_by_text("再診(婦人科)", exact=False).first
+            # 【重要】今見ている画面を画像として保存します（ActionsのSummaryで確認可能）
+            page.screenshot(path="error_debug.png")
+            _log("   デバッグ用スクリーンショットを保存しました。")
+
+            # ページ内のテキストをログに出して、何が表示されているか確認
+            content = page.inner_text("body")
+            _log(f"ページ内のテキスト（先頭100文字）: {content[:100]}...")
+
+            # 以前のソースに基づき、一番確実な方法でクリックを試みる
+            target = page.locator("li.nextpage").filter(has_text="再診(婦人科)").first
             
-            # 要素が存在するか確認してから、JavaScript経由で強制的にクリック
-            # これにより「スクロール待ち」や「他の要素による重なり」を無視して実行できます
-            reishin_target.evaluate("node => node.click()")
-            
-            _log("   JavaScript経由でクリックを実行しました。")
+            # JavaScriptでクリックを実行
+            target.evaluate("node => node.click()")
+            _log("   クリック命令を送信しました。")
             page.wait_for_timeout(3000)
 
             _log("3. 『次へ』ボタンをクリックします...")
