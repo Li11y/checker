@@ -27,4 +27,4 @@ jobs:
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
           CHECK_DATE: ${{ github.event.inputs.check_date }}
-        run: python clinic_main.py
+        run: python 200.Projects/Clinic/clinic_main.py
