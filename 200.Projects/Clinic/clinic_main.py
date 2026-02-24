@@ -40,15 +40,17 @@ def check_clinic_availability(target_date: str) -> Tuple[bool, str]:
             page.goto(CLINIC_URL, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(2000)
 
-            _log("2. 『再診(婦人科)』ボタンを探しています...")
-            # 送っていただいたソースコードに合わせて、liタグを直接指定します
-            reishin_btn = page.locator("li.nextpage").filter(has_text="再診(婦人科)").first
+            _log("2. 『再診(婦人科)』ボタンを文字で直接探しています...")
             
-            # 画面に見えるようにスクロールしてから、強制的にクリック
-            reishin_btn.scroll_into_view_if_needed()
-            reishin_btn.click(force=True)
+            # タグの種類を問わず、"再診(婦人科)" という文字が含まれる要素を探す
+            # ページ全体から一番最初に見つかったものをターゲットにします
+            reishin_target = page.get_by_text("再診(婦人科)", exact=False).first
             
-            _log("   クリックを送信しました。")
+            # 要素が存在するか確認してから、JavaScript経由で強制的にクリック
+            # これにより「スクロール待ち」や「他の要素による重なり」を無視して実行できます
+            reishin_target.evaluate("node => node.click()")
+            
+            _log("   JavaScript経由でクリックを実行しました。")
             page.wait_for_timeout(3000)
 
             _log("3. 『次へ』ボタンをクリックします...")
