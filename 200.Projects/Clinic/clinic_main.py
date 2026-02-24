@@ -32,7 +32,14 @@ def _log(msg):
 
 def check_clinic_availability(target_date: str) -> Tuple[bool, str]:
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        # 日本国内の公開プロキシサーバーを経由する設定を追加
+        # ※もし以下のプロキシが繋がらない場合は、別の日本のIPを探して差し替えます
+        browser = p.chromium.launch(
+            headless=True,
+            proxy={
+                "server": "http://160.16.109.131:8080" # 日本のプロキシサーバーの一例
+            }
+        )
         context = browser.new_context(user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1")
         page = context.new_page()
         try:
