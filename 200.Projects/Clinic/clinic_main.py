@@ -1,22 +1,41 @@
 import os
+import sys
 from playwright.sync_api import sync_playwright
+
+def _log(msg):
+    print(msg, file=sys.stderr, flush=True)
 
 def test_codmon():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        # iPhoneとして認識させてアクセスします
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
+        )
+        page = context.new_page()
+        
         try:
-            print("コドモンにアクセス中...")
-            page.goto("https://parents.codmon.com/", wait_until="networkidle")
+            _log("1. コドモンにアクセス開始...")
+            page.goto("https://parents.codmon.com/", wait_until="networkidle", timeout=60000)
             
-            # 画面内に「ログイン」という文字があるか確認
-            content = page.content()
-            if "ログイン" in content or "Login" in content:
-                print("✅ 成功！海外サーバーからでも正常にページが見えています。")
+            # 画面がしっかり出るまで少し待機
+            page.wait_for_timeout(5000)
+            
+            # 【重要】現在の画面を「screenshot.png」として保存
+            page.screenshot(path="screenshot.png")
+            _log("📸 スクリーンショットを保存しました。")
+            
+            # ページ内のテキストを細かくチェック
+            content = page.inner_text("body")
+            _log(f"ページの内容(抜粋): {content[:200]}")
+            
+            if "ログイン" in content or "ID" in content or "パスワード" in content:
+                _log("✅ ログイン画面を検知しました！")
             else:
-                print("❌ ページは開けましたが、ログイン画面が見つかりません。")
+                _log("⚠️ ログインボタンが見当たりません。画像を確認してください。")
+                
         except Exception as e:
-            print(f"❌ アクセス失敗: {e}")
+            _log(f"❌ エラー発生: {e}")
         finally:
             browser.close()
 
