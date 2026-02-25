@@ -28,8 +28,4 @@ jobs:
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
           CHECK_DATE: ${{ github.event.inputs.check_date }}
         run: python 200.Projects/Clinic/clinic_main.py
-      - name: Upload Screenshots
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots
-          path: "*.png"
+
